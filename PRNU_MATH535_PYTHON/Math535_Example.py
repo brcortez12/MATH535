@@ -17,15 +17,15 @@ import scipy.io as sio
 # Usage for an individual image
 # (example image is from Homework 2, 2nd_Camera, Regular Scenes folder
 # on the class Google Drive
-imx = 'PRNU_MATH535_PYTHON\images1'+os.sep+'IMG_1844.jpg'
+imx = 'PRNU_MATH535_PYTHON\Other Images Grey Cropped'+os.sep+'IMG_1736.jpeg'
 image_PRNU = Ft.NoiseExtractFromImage(imx, sigma=2.)
 
 # Usage for a folder of images to create a PRNU reference image for a device
 # (example folder is Regular Scenes folder from Homework 2, 2nd_Camera on the class Google Drive)
-image_folder = 'PRNU_MATH535_PYTHON\Camera Fingerprint Images Alt'
-image_paths = glob(os.path.join(image_folder, '*.jpg'))
+image_folder = 'PRNU_MATH535_PYTHON\Camera Fingerprint Images Grey Cropped'
+image_paths = glob(os.path.join(image_folder, '*.jpeg'))
 ref_Image, _ = gF.getFingerprint(image_paths)
-cv.imwrite('PRNU_MATH535_PYTHON\PRNU_Ref_Image.jpg', ref_Image)
+cv.imwrite('PRNU_MATH535_PYTHON\PRNU_Ref_Image.jpeg', ref_Image)
 
 # Note for correlation: use np.corrcoef(x, y)
 # This is: the sample correlation between points (treated as a sequence of values)
