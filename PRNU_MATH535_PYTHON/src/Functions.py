@@ -242,11 +242,11 @@ def NoiseExtract(Im,qmf,sigma,L):
     m = 2**L
     # use padding with mirrored image content
     minpad=2    # minimum number of padded rows and columns as well
-    nr = (np.ceil((M+minpad)/m)*m).astype(np.int);  nc = (np.ceil((N+minpad)/m)*m).astype(np.int)  # dimensions of the padded image (always pad 8 pixels or more)
-    pr = np.ceil((nr-M)/2).astype(np.int)      # number of padded rows on the top
-    prd= np.floor((nr-M)/2).astype(np.int)    # number of padded rows at the bottom
-    pc = np.ceil((nc-N)/2).astype(np.int)      # number of padded columns on the left
-    pcr= np.floor((nc-N)/2).astype(np.int)     # number of padded columns on the right
+    nr = (np.ceil((M+minpad)/m)*m).astype(np.int32);  nc = (np.ceil((N+minpad)/m)*m).astype(np.int32)  # dimensions of the padded image (always pad 8 pixels or more)
+    pr = np.ceil((nr-M)/2).astype(np.int32)      # number of padded rows on the top
+    prd= np.floor((nr-M)/2).astype(np.int32)    # number of padded rows at the bottom
+    pc = np.ceil((nc-N)/2).astype(np.int32)      # number of padded columns on the left
+    pcr= np.floor((nc-N)/2).astype(np.int32)     # number of padded columns on the right
     Im = np.block([
         [ Im[pr-1::-1,pc-1::-1],       Im[pr-1::-1,:],       Im[pr-1::-1,N-1:N-pcr-1:-1]],
         [ Im[:,pc-1::-1],              Im,                   Im[:,N-1:N-pcr-1:-1] ],
@@ -371,9 +371,9 @@ def Saturation(X, gray=False):
     M = X.shape[0];  N = X.shape[1]
     if X.max()<=250:
         if not gray:
-            SaturMap = np.ones(X.shape,dtype=np.bool)
+            SaturMap = np.ones(X.shape,dtype=np.bool_)
         else:
-            SaturMap = np.ones([M,N],dtype=np.bool)
+            SaturMap = np.ones([M,N],dtype=np.bool_)
         return SaturMap
     
     SaturMap = np.ones([M,N],dtype=np.int8)
@@ -475,7 +475,7 @@ def ZeroMean(X, zType='CFA'):
     odd/even pixels zero mean.
     
     """
-    
+    K = 1  # Grayscale image
     M, N = X.shape
     # initialize the output matrix and vectors
     Y = np.zeros(X.shape, dtype=X.dtype)

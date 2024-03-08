@@ -17,17 +17,15 @@ import scipy.io as sio
 # Usage for an individual image
 # (example image is from Homework 2, 2nd_Camera, Regular Scenes folder
 # on the class Google Drive
-imx = 'PRNU_MATH535_PYTHON\images1'+os.sep+'dune.jpg'
-print(imx)
+imx = 'PRNU_MATH535_PYTHON\images1'+os.sep+'IMG_1844.jpg'
 image_PRNU = Ft.NoiseExtractFromImage(imx, sigma=2.)
-
 
 # Usage for a folder of images to create a PRNU reference image for a device
 # (example folder is Regular Scenes folder from Homework 2, 2nd_Camera on the class Google Drive)
-ref_Image_Folder = glob(os.path.join('images2', '*.jpg'))
-ref_Image,_ = gF.getFingerprint(ref_Image_Folder)
-# sio.savemat('referenceImage.mat', {'ref_Image': ref_Image})
-Image.fromarray(ref_Image).save('PRNU_Ref_Image.jpg')
+image_folder = 'PRNU_MATH535_PYTHON\Camera Fingerprint Images Alt'
+image_paths = glob(os.path.join(image_folder, '*.jpg'))
+ref_Image, _ = gF.getFingerprint(image_paths)
+cv.imwrite('PRNU_MATH535_PYTHON\PRNU_Ref_Image.jpg', ref_Image)
 
 # Note for correlation: use np.corrcoef(x, y)
 # This is: the sample correlation between points (treated as a sequence of values)
@@ -36,3 +34,6 @@ Image.fromarray(ref_Image).save('PRNU_Ref_Image.jpg')
 # Example: correlation between the above individual reference image and camera reference image
 corr = np.corrcoef(np.reshape(ref_Image, (1,len(ref_Image)*len(ref_Image[0]))), np.reshape(image_PRNU, (1,len(image_PRNU)*len(image_PRNU[0]))))
 print(corr[0,1])
+
+# NEED TO MODIFY TO FOLLOW STEPS IN HW_3 PDF RATHER THAN THE EXAMPLE CODE: IT SHOULD NOT READ A SINGLE IMAGE BUT 30 THEN OPERATE ON A SET OF 70
+# Images have been downloaded from onedrive but need to be transformed beforehand, possibly adding the transform function to the beginning of this file after it it working properly

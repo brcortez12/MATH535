@@ -158,9 +158,9 @@ def NoiseExtractFromImage(image, sigma=2.0, color=False, noZM=False):
     M0, N0  = X.shape
     if X.dtype == 'uint8':
         # convert to [0,255]
-        X = X.astype(np.float)
+        X = X.astype(np.float32)
     elif X.dtype == 'uint16':
-        X = X.astype(np.float) / 65535 * 255
+        X = X.astype(np.float32) / 65535 * 255
 
     qmf = [ 	.230377813309,	.714846570553, .630880767930, -.027983769417,
            -.187034811719,	.030841381836, .032883011667, -.010597401785]
