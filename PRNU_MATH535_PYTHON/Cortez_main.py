@@ -49,7 +49,8 @@ def main():
     test_fingerprint = extract_image_fingerprint(test_image_path)
 
     # Save the fingerprint as ImageFPrint(i)
-    with open('ImageFPrint(i).txt', 'wb') as f:
+    output_file_path = os.path.join(output_folder, 'ImageFPrint(i).txt')
+    with open(output_file_path, 'wb') as f:
         np.savetxt(f, test_fingerprint, fmt='%f')
 
     print("Fingerprint from test image saved as ImageFPrint(i)")
