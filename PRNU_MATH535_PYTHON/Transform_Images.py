@@ -16,11 +16,11 @@ def crop_and_save(output_path, img_path):
         processed_img = grayscale_img
     cv2.imwrite(output_path, processed_img)
 
-def process_images(camera_input_folder, other_input_folder, output_folder):
+def process_images(camera_input_folder, other_input_folder, root_folder):
     print("Processing images...")
     # Create output folders if they don't exist
-    camera_output_folder = os.path.join(output_folder, "Camera Fingerprint Images Grey Cropped")
-    other_output_folder = os.path.join(output_folder, "Other Images Grey Cropped")
+    camera_output_folder = os.path.join(root_folder, "Camera Fingerprint Images Grey Cropped")
+    other_output_folder = os.path.join(root_folder, "Other Images Grey Cropped")
     os.makedirs(camera_output_folder, exist_ok=True)
     os.makedirs(other_output_folder, exist_ok=True)
 
@@ -36,3 +36,5 @@ def process_images(camera_input_folder, other_input_folder, output_folder):
         output_path = os.path.join(other_output_folder, img_name)
         crop_and_save(output_path, img_path)
     print("Processing Done.")
+
+    return camera_output_folder, other_output_folder
