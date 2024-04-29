@@ -81,7 +81,7 @@ def main():
     adjusted_image = adjusted_image.astype(np.uint8)  # Convert to uint8 for display
 
     # Save the adjusted image as a JPEG file
-    output_filename = 'PRNU_MATH535_PYTHON\adjusted_PRNU_Image.jpeg'
+    output_filename = 'PRNU_MATH535_PYTHON\PRNU_Ref_Image_Adjusted.jpeg'
     cv2.imwrite(output_filename, adjusted_image)
 
     print(f"Adjusted image saved as {output_filename}")
