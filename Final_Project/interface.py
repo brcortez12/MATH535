@@ -1,5 +1,6 @@
 # MATH535 - Final Project - Brandon Cortez
 import sys
+from skimage import io, util, color
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QIcon, QImage, QPixmap
@@ -19,6 +20,9 @@ class DigitalForensicsToolkitApp(QMainWindow):
 
         self.image_label = QLabel("No image loaded", self)
         layout.addWidget(self.image_label)
+
+        self.display_label = QLabel("No image generated", self)
+        layout.addWidget(self.display_label)
 
         self.load_button = QPushButton(QIcon("icons/open.png"), "Load Image", self)
         self.load_button.clicked.connect(self.load_image)
@@ -40,15 +44,19 @@ class DigitalForensicsToolkitApp(QMainWindow):
         self.quit_button.clicked.connect(self.quit_application)
         layout.addWidget(self.quit_button)
 
-        self.loaded_image = None
-        self.embedded_image = None
-        self.difference_image = None
+        self.loaded_image_path = None
+        self.embedded_image_path = None
+        self.difference_image_path = None
 
     def load_image(self):
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.bmp *.gif)", options=options)
         if filename:
-            self.loaded_image = filename
+            self.loaded_image_path = filename
+            cover_image = io.imread(filename)
+            cover_image_gray = color.rgb2gray(cover_image)
+            self.loaded_image = util.img_as_ubyte(cover_image_gray)
+            
             pixmap = QPixmap(filename)
             # Convert to grayscale
             pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
@@ -56,26 +64,32 @@ class DigitalForensicsToolkitApp(QMainWindow):
             pixmap = pixmap.scaled(self.image_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
             self.image_label.setPixmap(pixmap)
 
-
     def embed(self):
-        if self.loaded_image:
+        if self.loaded_image_path:
             message, ok = QInputDialog.getText(self, "Embed Message", "Enter the message to embed:")
             if ok:
-                self.embedded_image = embed_message(self.loaded_image, message)
+                self.embedded_image, self.embedded_image_path = embed_message(self.loaded_image_path, message)
                 self.show_info_message("Digital Forensics Toolkit", "'" + message + "' Embedded Successfully")
         else:
             self.show_error_message("Error", "No image loaded!")
 
     def extract(self):
-        if self.embedded_image is not None:
+        if self.embedded_image_path is not None:
             extracted_message = extract_message(self.embedded_image)
             self.show_info_message("Extracted Message", extracted_message)
         else:
             self.show_error_message("Error", "No embedded image loaded!")
 
     def display_LSBs(self):
-        if self.loaded_image:
-            self.difference_image = difference_LSBs(self.loaded_image, self.embedded_image)
+        if self.embedded_image_path is not None:
+            self.difference_image_path = difference_LSBs(self.loaded_image, self.embedded_image)
+            if self.difference_image_path:
+                pixmap = QPixmap(self.difference_image_path)
+                # Convert to grayscale
+                pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
+                pixmap = QPixmap.fromImage(pixmap)
+                pixmap = pixmap.scaled(self.display_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
+                self.display_label.setPixmap(pixmap)
         else:
             self.show_error_message("Error", "No image loaded!")
 

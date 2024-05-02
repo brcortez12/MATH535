@@ -1,4 +1,5 @@
 # MATH535 - Final Project - Brandon Cortez
+import cv2
 import numpy as np
 from skimage import io, util, color
 import matplotlib.pyplot as plt
@@ -33,11 +34,16 @@ def embed_message(image_path, message):
     print("Binary Message: ", binary_message)
     print("Message Length: ", message_length)
     print("Binary Message Length: ", binary_message_length)
-    return stego_image_gray
 
-def extract_message(stego_image_gray): #Does not compute length correctly
-    # Load the stego image and convert to grayscale
-    # stego_image = io.imread(image_path)
+    # Save the difference image in the current directory
+    filename = "./embedded_image.png"
+    cv2.imwrite(filename, stego_image_gray)
+
+    return stego_image_gray, filename
+
+def extract_message(stego_image_gray):
+    # Load the stego image and convert to grayscale if needed
+    # stego_image = io.imread(stego_image_path)
     # stego_image_gray = color.rgb2gray(stego_image)
     # stego_image_gray = util.img_as_ubyte(stego_image_gray)
     # Flatten the grayscale stego image
@@ -72,4 +78,9 @@ def difference_LSBs(cover_image, stego_image):
     # Compute difference image to display changed LSBs
     difference_image = np.abs(cover_image - stego_image)
 
-    return difference_image
+    # Save the difference image in the current directory
+    filename = "./difference_image.png"
+    cv2.imwrite(filename, difference_image)
+
+    # Return the filename
+    return filename
