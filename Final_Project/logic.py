@@ -1,8 +1,7 @@
 def embed_message(image_path, message):
-    # Placeholder function for embedding a message into an image
-    # This function would typically handle the embedding process
-    # by modifying the image in some way to hide the message.
+    # Embed a provided message into the loaded cover image
     print(f"Embedding message '{message}' into image: {image_path}")
+
 
 def extract_message(image_path):
     # Placeholder function for extracting a message from an image

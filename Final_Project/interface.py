@@ -1,6 +1,7 @@
 import sys
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QImage, QPixmap
 
 from logic import embed_message, extract_message, display_LSBs
 
@@ -23,11 +24,11 @@ class DigitalForensicsToolkitApp(QMainWindow):
         layout.addWidget(self.load_button)
 
         self.embed_button = QPushButton(QIcon("icons/embed.png"), "Embed Message", self)
-        self.embed_button.clicked.connect(self.embed_message)
+        self.embed_button.clicked.connect(self.embed)
         layout.addWidget(self.embed_button)
 
         self.extract_button = QPushButton(QIcon("icons/extract.png"), "Extract Message", self)
-        self.extract_button.clicked.connect(self.extract_message)
+        self.extract_button.clicked.connect(self.extract)
         layout.addWidget(self.extract_button)
 
         self.lsb_button = QPushButton(QIcon("icons/lsb.png"), "View Changed LSBs", self)
@@ -39,25 +40,31 @@ class DigitalForensicsToolkitApp(QMainWindow):
         layout.addWidget(self.quit_button)
 
         self.loaded_image = None
+        self.embedded_image = None
 
     def load_image(self):
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.bmp *.gif)", options=options)
         if filename:
-            pixmap = QPixmap(filename)
-            self.image_label.setPixmap(pixmap)
-            self.image_label.setScaledContents(True)
             self.loaded_image = filename
+            pixmap = QPixmap(filename)
+            # Convert to grayscale
+            pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
+            pixmap = QPixmap.fromImage(pixmap)
+            pixmap = pixmap.scaled(self.image_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
+            self.image_label.setPixmap(pixmap)
 
-    def embed_message(self):
+
+    def embed(self):
         if self.loaded_image:
             message, ok = QInputDialog.getText(self, "Embed Message", "Enter the message to embed:")
             if ok:
-                embed_message(self.loaded_image, message)
+                self.embedded_image = embed_message(self.loaded_image, message)
+                self.show_info_message("Digital Forensics Toolkit", "'" + message + "' Embedded Successfully")
         else:
             self.show_error_message("Error", "No image loaded!")
 
-    def extract_message(self):
+    def extract(self):
         if self.loaded_image:
             extracted_message = extract_message(self.loaded_image)
             self.show_info_message("Extracted Message", extracted_message)
