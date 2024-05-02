@@ -29,9 +29,13 @@ def embed_message(image_path, message):
     # Reshape the grayscale cover image back to its original shape to form the stego image
     stego_image_gray = cover_image_flat.reshape(cover_image_gray.shape)
 
+    print("Message: ", message)
+    print("Binary Message: ", binary_message)
+    print("Message Length: ", message_length)
+    print("Binary Message Length: ", binary_message_length)
     return stego_image_gray
 
-def extract_message(stego_image_gray):
+def extract_message(stego_image_gray): #Does not compute length correctly
     # Load the stego image and convert to grayscale
     # stego_image = io.imread(image_path)
     # stego_image_gray = color.rgb2gray(stego_image)
@@ -48,7 +52,7 @@ def extract_message(stego_image_gray):
 
     # Extract the binary message from the LSBs of the pixels after the message length
     binary_message = ''
-    for i in range(16, 16 + message_length * 8):
+    for i in range(16, 16 + message_length):
         binary_message += str(stego_image_flat[i] & 1)
 
     # Convert binary message to ASCII characters
@@ -57,11 +61,15 @@ def extract_message(stego_image_gray):
         byte = binary_message[i:i+8]
         message += chr(int(byte, 2))
 
+    print("Message: ", message)
+    print("Binary Message: ", binary_message)
+    print("Message Length: ", message_length)
+    print("Binary Message Length: ", binary_message_length)
     return message
 
 
-def display_LSBs(image_path):
-    # Placeholder function for displaying the changed LSBs of an image
-    # This function would typically analyze the image to visualize
-    # any changes made to the least significant bits (LSBs).
-    print(f"Displaying changed LSBs of image: {image_path}")
+def difference_LSBs(cover_image, stego_image):
+    # Compute difference image to display changed LSBs
+    difference_image = np.abs(cover_image - stego_image)
+
+    return difference_image

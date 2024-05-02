@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QIcon, QImage, QPixmap
 
-from logic import embed_message, extract_message, display_LSBs
+from logic import embed_message, extract_message, difference_LSBs
 
 class DigitalForensicsToolkitApp(QMainWindow):
     def __init__(self):
@@ -42,6 +42,7 @@ class DigitalForensicsToolkitApp(QMainWindow):
 
         self.loaded_image = None
         self.embedded_image = None
+        self.difference_image = None
 
     def load_image(self):
         options = QFileDialog.Options()
@@ -74,7 +75,7 @@ class DigitalForensicsToolkitApp(QMainWindow):
 
     def display_LSBs(self):
         if self.loaded_image:
-            display_LSBs(self.loaded_image)
+            self.difference_image = difference_LSBs(self.loaded_image, self.embedded_image)
         else:
             self.show_error_message("Error", "No image loaded!")
 
