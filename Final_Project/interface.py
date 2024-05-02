@@ -1,3 +1,4 @@
+# MATH535 - Final Project - Brandon Cortez
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
@@ -65,11 +66,11 @@ class DigitalForensicsToolkitApp(QMainWindow):
             self.show_error_message("Error", "No image loaded!")
 
     def extract(self):
-        if self.loaded_image:
-            extracted_message = extract_message(self.loaded_image)
+        if self.embedded_image is not None:
+            extracted_message = extract_message(self.embedded_image)
             self.show_info_message("Extracted Message", extracted_message)
         else:
-            self.show_error_message("Error", "No image loaded!")
+            self.show_error_message("Error", "No embedded image loaded!")
 
     def display_LSBs(self):
         if self.loaded_image:
