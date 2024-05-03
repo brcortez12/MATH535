@@ -1,9 +1,9 @@
-# MATH535 - Final Project - Brandon Cortez
 import sys
 from skimage import io, util, color
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QIcon, QImage, QPixmap
+import matplotlib.pyplot as plt
 
 from logic import embed_message, extract_message, difference_LSBs
 
@@ -46,17 +46,12 @@ class DigitalForensicsToolkitApp(QMainWindow):
 
         self.loaded_image_path = None
         self.embedded_image_path = None
-        self.difference_image_path = None
 
     def load_image(self):
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.bmp *.gif)", options=options)
         if filename:
             self.loaded_image_path = filename
-            cover_image = io.imread(filename)
-            cover_image_gray = color.rgb2gray(cover_image)
-            self.loaded_image = util.img_as_ubyte(cover_image_gray)
-            
             pixmap = QPixmap(filename)
             # Convert to grayscale
             pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
@@ -68,28 +63,26 @@ class DigitalForensicsToolkitApp(QMainWindow):
         if self.loaded_image_path:
             message, ok = QInputDialog.getText(self, "Embed Message", "Enter the message to embed:")
             if ok:
-                self.embedded_image, self.embedded_image_path = embed_message(self.loaded_image_path, message)
+                self.embedded_image_path = embed_message(self.loaded_image_path, message)
                 self.show_info_message("Digital Forensics Toolkit", "'" + message + "' Embedded Successfully")
         else:
             self.show_error_message("Error", "No image loaded!")
 
     def extract(self):
         if self.embedded_image_path is not None:
-            extracted_message = extract_message(self.embedded_image)
+            extracted_message = extract_message(self.embedded_image_path)
             self.show_info_message("Extracted Message", extracted_message)
         else:
             self.show_error_message("Error", "No embedded image loaded!")
 
     def display_LSBs(self):
         if self.embedded_image_path is not None:
-            self.difference_image_path = difference_LSBs(self.loaded_image, self.embedded_image)
-            if self.difference_image_path:
-                pixmap = QPixmap(self.difference_image_path)
-                # Convert to grayscale
-                pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
-                pixmap = QPixmap.fromImage(pixmap)
-                pixmap = pixmap.scaled(self.display_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
-                self.display_label.setPixmap(pixmap)
+            difference_image = difference_LSBs(self.loaded_image_path, self.embedded_image_path)
+                
+            # Display the difference image
+            plt.imshow(difference_image, cmap='gray', vmin=0, vmax=255)
+            plt.axis('off')  # Turn off axis
+            plt.show()
         else:
             self.show_error_message("Error", "No image loaded!")
 
