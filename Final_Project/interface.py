@@ -1,9 +1,9 @@
+# MATH535 - Final Project - Brandon Cortez - interface.py - 5/3/2024
 import sys
 import cv2
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox, QSizePolicy
 from PyQt5.QtGui import QImage, QPixmap
-import matplotlib.pyplot as plt
 
 from logic import embed_message, extract_message
 

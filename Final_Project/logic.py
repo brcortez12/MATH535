@@ -1,8 +1,5 @@
-# MATH535 - Final Project - Brandon Cortez
-import cv2
-import numpy as np
+# MATH535 - Final Project - Brandon Cortez - logic.py - 5/3/2024
 from skimage import io, util, color
-import matplotlib.pyplot as plt
 
 def embed_message(image_path, message):
     # Embed a provided message into the loaded cover image
