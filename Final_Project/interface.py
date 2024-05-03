@@ -1,9 +1,8 @@
 import sys
 import cv2
-from skimage import io, util, color
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox
-from PyQt5.QtGui import QIcon, QImage, QPixmap
+from PyQt5.QtWidgets import QApplication, QInputDialog, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QMessageBox, QSizePolicy
+from PyQt5.QtGui import QImage, QPixmap
 import matplotlib.pyplot as plt
 
 from logic import embed_message, extract_message
@@ -14,35 +13,47 @@ class DigitalForensicsToolkitApp(QMainWindow):
 
         self.setWindowTitle("Digital Forensics Toolkit")
         self.setGeometry(100, 100, 800, 600)
-
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
         layout = QVBoxLayout(central_widget)
 
-        self.image_label = QLabel("No image loaded", self)
-        layout.addWidget(self.image_label)
+        # Create a container widget to hold the welcome message label
+        welcome_container = QWidget(self)
+        welcome_container.setLayout(QVBoxLayout())  # Use a QVBoxLayout for the container widget
+        layout.addWidget(welcome_container)
 
-        self.display_label = QLabel("No image generated", self)
-        layout.addWidget(self.display_label)
+        # Create the welcome message label with styled CSS for background and text
+        self.welcome_label = QLabel("Welcome to the Digital Forensics Toolkit!", self)
+        self.welcome_label.setAlignment(Qt.AlignCenter)
+        self.welcome_label.setStyleSheet(
+            "background-color: #c7dceb; color: black; font-size: 32px; padding: 20px; border-radius: 10px;")
 
-        self.load_button = QPushButton(QIcon("icons/open.png"), "Load Image", self)
-        self.load_button.clicked.connect(self.load_image)
-        layout.addWidget(self.load_button)
+        welcome_container.layout().addWidget(self.welcome_label)  # Add the welcome label to the container widget
 
-        self.embed_button = QPushButton(QIcon("icons/embed.png"), "Embed Message", self)
-        self.embed_button.clicked.connect(self.embed)
-        layout.addWidget(self.embed_button)
+        self.begin_button = QPushButton("Begin", self)
+        self.begin_button.clicked.connect(self.choose_operation)
+        self.begin_button.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px;")
+        layout.addWidget(self.begin_button)
 
-        self.extract_button = QPushButton(QIcon("icons/extract.png"), "Extract Message", self)
-        self.extract_button.clicked.connect(self.extract)
-        layout.addWidget(self.extract_button)
-
-        self.quit_button = QPushButton(QIcon("icons/quit.png"), "Quit", self)
+        self.quit_button = QPushButton("Quit", self)
         self.quit_button.clicked.connect(self.quit_application)
+        self.quit_button.setStyleSheet("background-color: #F44336; color: white; font-size: 16px;")
         layout.addWidget(self.quit_button)
+
+        self.begin_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.quit_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.loaded_image_path = None
         self.embedded_image_path = None
+
+    def choose_operation(self):
+        operations = ["Embed a Message Into an Image", "Extract a Message From an Image"]
+        operation, ok = QInputDialog.getItem(self, "Choose Operation", "Select an operation:", operations, 0, False)
+        if ok:
+            if operation == "Embed a Message Into an Image":
+                self.embed()
+            elif operation == "Extract a Message From an Image":
+                self.extract()
 
     def load_image(self):
         options = QFileDialog.Options()
@@ -53,29 +64,48 @@ class DigitalForensicsToolkitApp(QMainWindow):
             # Convert to grayscale
             pixmap = pixmap.toImage().convertToFormat(QImage.Format_Grayscale8)
             pixmap = QPixmap.fromImage(pixmap)
-            pixmap = pixmap.scaled(self.image_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
-            self.image_label.setPixmap(pixmap)
+            pixmap = pixmap.scaled(self.welcome_label.size(), aspectRatioMode=Qt.KeepAspectRatio)
+            self.welcome_label.setPixmap(pixmap)
 
     def embed(self):
+        self.load_image()
         if self.loaded_image_path:
             message, ok = QInputDialog.getText(self, "Embed Message", "Enter the message to embed:")
             if ok:
                 self.embedded_image = embed_message(self.loaded_image_path, message)
                 self.show_info_message("Digital Forensics Toolkit", "'" + message + "' Embedded Successfully")
-                self.embedded_image_path = "./embedded_image.png"
-                cv2.imwrite(self.embedded_image_path, self.embedded_image)
-        else:
-            self.show_error_message("Error", "No image loaded!")
+                save_option = self.prompt_save_option()
+                if save_option:
+                    self.save_image(self.embedded_image)
+                    self.reset_ui()  # Reset UI after saving the embedded image
 
     def extract(self):
-        if self.embedded_image is not None:
-            extracted_message = extract_message(self.embedded_image_path)
+        self.load_image()
+        if self.loaded_image_path:
+            extracted_message = extract_message(self.loaded_image_path)
             self.show_info_message("Extracted Message", extracted_message)
-        else:
-            self.show_error_message("Error", "No embedded image loaded!")
+
+    def prompt_save_option(self):
+        save_option, ok = QInputDialog.getItem(self, "Save Image", "Do you want to save the embedded image?", ["Yes", "No"], 0, False)
+        return save_option == "Yes"
+
+    def save_image(self, image):
+        options = QFileDialog.Options()
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "Image Files (*.png *.jpg *.bmp)", options=options)
+        if filename:
+            cv2.imwrite(filename, image)
+            self.show_info_message("Digital Forensics Toolkit", "Image saved successfully!")
+
+    def reset_ui(self):
+        # Reset UI elements to their initial states
+        self.loaded_image_path = None
+        self.embedded_image_path = None
+        self.show_welcome_image()
 
     def quit_application(self):
-        QApplication.quit()
+        reply = QMessageBox.question(self, 'Confirm Exit', 'Are you sure you want to exit?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            QApplication.quit()
 
     def show_error_message(self, title, message):
         QMessageBox.critical(self, title, message, QMessageBox.Ok)
