@@ -35,11 +35,7 @@ def embed_message(image_path, message):
     print("Message Length: ", message_length)
     print("Binary Message Length: ", binary_message_length)
 
-    # Save the difference image in the current directory
-    stego_filename = "./embedded_image.png"
-    cv2.imwrite(stego_filename, stego_image_gray)
-
-    return stego_filename
+    return stego_image_gray
 
 def extract_message(stego_image_path):
     # Load the stego image and convert to grayscale if needed
@@ -72,20 +68,3 @@ def extract_message(stego_image_path):
     print("Message Length: ", message_length)
     print("Binary Message Length: ", binary_message_length)
     return message
-
-
-def difference_LSBs(cover_image_path, stego_image_path):
-    cover_image = io.imread(cover_image_path)
-    cover_image_gray = color.rgb2gray(cover_image)
-    cover_image_gray = util.img_as_ubyte(cover_image_gray)
-
-    stego_image = io.imread(stego_image_path)
-    # Compute difference image to display changed LSBs
-    difference_image = np.abs(cover_image_gray - stego_image)
-
-    # Save the difference image in the current directory
-    filename = "./difference_image.png"
-    cv2.imwrite(filename, difference_image)
-
-    # Return the filename
-    return difference_image
