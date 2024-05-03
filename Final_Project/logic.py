@@ -40,9 +40,6 @@ def embed_message(image_path, message):
 def extract_message(stego_image_path):
     # Load the stego image and convert to grayscale if needed
     stego_image = io.imread(stego_image_path)
-    # stego_image_gray = color.rgb2gray(stego_image)
-    # stego_image_gray = util.img_as_ubyte(stego_image_gray)
-    # Flatten the grayscale stego image
     stego_image_flat = stego_image.ravel()
 
     # Extract the message length from the LSBs of the first 16 pixels
@@ -62,6 +59,11 @@ def extract_message(stego_image_path):
     for i in range(0, len(binary_message), 8):
         byte = binary_message[i:i+8]
         message += chr(int(byte, 2))
+
+    # Check if the first character of the extracted message is a valid ASCII character to help try to catch instances where there is no embedded image
+    if not message or not message[0].isascii():
+        print("No embedded message found.")
+        return "No embedded message found."
 
     print("Message: ", message)
     print("Binary Message: ", binary_message)
